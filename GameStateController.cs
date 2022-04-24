@@ -4,6 +4,21 @@ using Godot;
 
 namespace RelEcs.Godot
 {
+    public class CurrentGameState
+    {
+        public GameState State;
+    }
+
+    public class GodotInputEvent
+    {
+        public InputEvent Event;
+    }
+
+    public class DeltaTime
+    {
+        public float Value;
+    }
+
     public class GameStateController : Node
     {
         Dictionary<Type, GameState> states = new Dictionary<Type, GameState>();
