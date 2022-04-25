@@ -6,10 +6,16 @@ namespace RelEcs.Godot
     public struct NodeEntity { }
 
     // wraps a godot node into an ecs component
-    public struct Node<T> where T : Node
+    public struct Node<T> : IReset<Node<T>> where T : Node
     {
         public T Value;
         public Node(T value) => Value = value;
+        
+        public void Reset(ref Node<T> c)
+        {
+            c.Value?.QueueFree();
+            c.Value = null;
+        }
     }
 
     // wraps an ecs object into a godot variant
