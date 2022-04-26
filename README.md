@@ -15,19 +15,23 @@ Entity entity = commands.Spawn(instance);
 
 // Let's say our Scene looks like this:
 //
-// SomeScene (ScomeScene : Node2D)
+// SomeScene (SomeScene : Node2D)
 // -- Sprite (Sprite : Node2D)
 // -- Health (Health : Node)
 // 
 // Then we can query for those Nodes like so:
 var query = commands.Query().Has<Node<SomeScene>, Node<Sprite>, Node<health>>();
-// nodes will automatically be wrapped into a struct Node<T> { public T Value; } component, where T is the class of the node.
-// note that the root node, in this case SomeScene, is also added as a component to the ecs entity, next to it's children.
+// nodes will automatically be wrapped into a struct Node<T> { public T Value; } component, 
+// where T is the class of the node.
+// note that the root node, in this case SomeScene, is also added as a component to the ecs entity, 
+// next to it's children.
 
 // and we can of course also use our handy ForEach function for iterating.
-commands.ForEach((Entity entity, ref Node<SomeScene> someScene, ref Node<Sprite> sprite, ref Node<Health> health) => {
+commands.ForEach((Entity entity, ref Node<SomeScene> someScene, ref Node<Sprite> sprite) =>
+{
+    // do something with your nodes here
+});
 
 // entities that are spawned from using a node also have a special relation that you can query for
 var allNodeEntities = commands.Query().IsA<NodeEntity>();
-});
 ```
