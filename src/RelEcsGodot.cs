@@ -31,7 +31,7 @@ namespace RelEcs.Godot
         {
             var entity = commands.Spawn().Add<IsA, NodeEntity>();
 
-            Array nodes = new Array();
+            var nodes = new Array();
             nodes.Add(parent);
 
             foreach (Node child in parent.GetChildren())
@@ -51,7 +51,8 @@ namespace RelEcs.Godot
 
         public static void AddNodeHandle<T>(Entity entity, T node) where T : Node
         {
-            entity.Add<Node<T>>(new Node<T>(node));
+            entity.Add(new Node<T>(node));
+            node.SetMeta("Entity", new Marshallable<Entity>(entity));
         }
     }
 }
