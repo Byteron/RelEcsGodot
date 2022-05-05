@@ -19,7 +19,7 @@ namespace RelEcs.Godot
     }
 
     // wraps an ecs object into a godot variant
-    public class Marshallable<T> : Reference
+    public class Marshallable<T> : Object
     {
         public T Value;
         public Marshallable(T value) => Value = value;
