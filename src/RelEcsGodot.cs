@@ -3,19 +3,17 @@ using Godot.Collections;
 
 namespace RelEcs.Godot
 {
-    public struct NodeEntity { }
+    public struct Root
+    {
+        public Node Node;
+        public Root(Node node) => Node = node;
+    }
 
     // wraps a godot node into an ecs component
-    public struct Node<T> : IReset<Node<T>> where T : Node
+    public struct Node<T> where T : Node
     {
         public T Value;
         public Node(T value) => Value = value;
-        
-        public void Reset(ref Node<T> c)
-        {
-            c.Value?.QueueFree();
-            c.Value = null;
-        }
     }
 
     // wraps an ecs object into a godot variant
@@ -29,7 +27,7 @@ namespace RelEcs.Godot
     {
         public static Entity Spawn(this Commands commands, Node parent)
         {
-            var entity = commands.Spawn().Add<IsA, NodeEntity>();
+            var entity = commands.Spawn().Add(new Root(parent));
 
             var nodes = new Array();
             nodes.Add(parent);
@@ -53,6 +51,19 @@ namespace RelEcs.Godot
         {
             entity.Add(new Node<T>(node));
             node.SetMeta("Entity", new Marshallable<Entity>(entity));
+        }
+    }
+
+    public static class EntityExtensions
+    {
+        public static void DespawnAndFree(this Entity entity)
+        {
+            if (entity.Has<Root>())
+            {
+                entity.Get<Root>().Node.QueueFree();
+            }
+            
+            entity.Despawn();
         }
     }
 }

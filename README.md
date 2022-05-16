@@ -25,6 +25,10 @@ Entity entity = commands.Spawn(instance);
 // like adding other struct components to it.
 entity.Add(new Health { Value = 10 })
 
+// despawns the entity AND frees the node it was created from.
+entity.DespawnAndFree();
+// NOTE: just calling entity.Despawn() will not free the node, only the entity.
+
 // We can query for those Nodes like so:
 var query = commands.Query().Has<Node<SomeScene>, Node<Sprite>, Health>();
 // nodes will automatically be wrapped into a struct Node<T> { public T Value; } component, 
@@ -38,6 +42,6 @@ commands.ForEach((Entity entity, ref Node<Sprite> sprite, ref Health health) =>
     // do something with your nodes here
 });
 
-// entities that are spawned from using a node also have a special relation that you can query for
-var allNodeEntities = commands.Query().IsA<NodeEntity>();
+// entities that are spawned from a node also have a special component that you can query for.
+var allNodeEntities = commands.Query().Has<Root>();
 ```
