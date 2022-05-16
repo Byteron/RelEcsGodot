@@ -8,8 +8,6 @@ namespace RelEcs.Godot
         public Node Node;
         public Root(Node node) => Node = node;
     }
-    
-    public struct IsA { }
 
     // wraps a godot node into an ecs component
     public struct Node<T> where T : Node
@@ -58,9 +56,9 @@ namespace RelEcs.Godot
 
     public static class EntityExtensions
     {
-        public static void Despawn(this Entity entity, bool despawnRoot)
+        public static void DespawnAndFree(this Entity entity)
         {
-            if (entity.Has<Root>() && despawnRoot)
+            if (entity.Has<Root>())
             {
                 entity.Get<Root>().Node.QueueFree();
             }
