@@ -37,6 +37,11 @@ namespace RelEcs.Godot
             }
         }
         
+        public static void SpawnRecursively(this Commands commands, Node node)
+        {
+            commands.World.SpawnRecursively(node);
+        }
+
         public static Entity Spawn(this World world, Node parent)
         {
             var entity = world.Spawn().Add(new Root(parent));
