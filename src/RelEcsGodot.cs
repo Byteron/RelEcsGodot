@@ -25,6 +25,18 @@ namespace RelEcs.Godot
     
     public static class WorldExtensions
     {
+        public static void SpawnRecursively(this World world, Node node)
+        {
+            world.Spawn(node);
+            
+            foreach (Node child in node.GetChildren())
+            {
+                if (child.GetChildCount() == 0) continue;
+                
+                world.SpawnRecursively(child);
+            }
+        }
+        
         public static Entity Spawn(this World world, Node parent)
         {
             var entity = world.Spawn().Add(new Root(parent));
