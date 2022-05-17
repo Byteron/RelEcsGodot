@@ -22,12 +22,12 @@ namespace RelEcs.Godot
         public T Value;
         public Marshallable(T value) => Value = value;
     }
-
-    public static class CommandsExtensions
+    
+    public static class WorldExtensions
     {
-        public static Entity Spawn(this Commands commands, Node parent)
+        public static Entity Spawn(this World world, Node parent)
         {
-            var entity = commands.Spawn().Add(new Root(parent));
+            var entity = world.Spawn().Add(new Root(parent));
 
             var nodes = new Array();
             nodes.Add(parent);
@@ -51,6 +51,14 @@ namespace RelEcs.Godot
         {
             entity.Add(new Node<T>(node));
             node.SetMeta("Entity", new Marshallable<Entity>(entity));
+        }
+    }
+    
+    public static class CommandsExtensions
+    {
+        public static Entity Spawn(this Commands commands, Node parent)
+        {
+            return commands.World.Spawn(parent);
         }
     }
 
