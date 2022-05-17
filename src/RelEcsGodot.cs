@@ -39,7 +39,7 @@ namespace RelEcs.Godot
 
             foreach (Node node in nodes)
             {
-                var addMethod = typeof(CommandsExtensions).GetMethod("AddNodeHandle");
+                var addMethod = typeof(WorldExtensions).GetMethod("AddNodeHandle");
                 var addChildMethod = addMethod?.MakeGenericMethod(new[] { node.GetType() });
                 addChildMethod?.Invoke(null, new object[] { entity, node });
             }
