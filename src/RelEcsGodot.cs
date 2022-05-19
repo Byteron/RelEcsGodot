@@ -3,14 +3,14 @@ using Godot.Collections;
 
 namespace RelEcs.Godot
 {
-    public struct Root
+    public class Root
     {
         public Node Node;
         public Root(Node node) => Node = node;
     }
 
     // wraps a godot node into an ecs component
-    public struct Node<T> where T : Node
+    public class Node<T> where T : Node
     {
         public T Value;
         public Node(T value) => Value = value;
@@ -42,14 +42,14 @@ namespace RelEcs.Godot
             commands.World.SpawnRecursively(node);
         }
 
-        public static Entity Spawn(this World world, Node parent)
+        public static Entity Spawn(this World world, Node root)
         {
-            var entity = world.Spawn().Add(new Root(parent));
+            var entity = world.Spawn().Add(new Root(root));
 
             var nodes = new Array();
-            nodes.Add(parent);
+            nodes.Add(root);
 
-            foreach (Node child in parent.GetChildren())
+            foreach (Node child in root.GetChildren())
             {
                 nodes.Add(child);
             }
@@ -66,7 +66,7 @@ namespace RelEcs.Godot
 
         public static void AddNodeHandle<T>(Entity entity, T node) where T : Node
         {
-            entity.Add(new Node<T>(node));
+            entity.Add<T>(node);
             node.SetMeta("Entity", new Marshallable<Entity>(entity));
         }
     }
