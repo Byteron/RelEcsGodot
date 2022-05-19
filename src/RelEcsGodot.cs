@@ -9,13 +9,6 @@ namespace RelEcs.Godot
         public Root(Node node) => Node = node;
     }
 
-    // wraps a godot node into an ecs component
-    public class Node<T> where T : Node
-    {
-        public T Value;
-        public Node(T value) => Value = value;
-    }
-
     // wraps an ecs object into a godot variant
     public class Marshallable<T> : Object
     {
