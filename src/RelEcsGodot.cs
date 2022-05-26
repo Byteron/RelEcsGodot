@@ -6,13 +6,13 @@ namespace RelEcs.Godot
     public class Root
     {
         public Node Node;
-        public Root(Node node) => Node = node;
     }
 
     // wraps an ecs object into a godot variant
-    public class Marshallable<T> : Object
+    public partial class Marshallable<T> : Object
     {
         public T Value;
+        public Marshallable() => Value = default;
         public Marshallable(T value) => Value = value;
     }
     
@@ -29,16 +29,19 @@ namespace RelEcs.Godot
                 world.SpawnRecursively(child);
             }
         }
-        
-        public static void SpawnRecursively(this Commands commands, Node node)
-        {
-            commands.World.SpawnRecursively(node);
-        }
 
         public static Entity Spawn(this World world, Node root)
         {
-            var entity = world.Spawn().Add(new Root(root));
-
+            var entity = world.Spawn();
+            world.AttachNode(entity, root);
+            return entity;
+        }
+        
+        public static void AttachNode(this World _, Entity entity, Node root)
+        {
+            entity.Add(new Root { Node = root });
+            root.SetMeta("Entity", new Marshallable<Entity>(entity));
+            
             var nodes = new Array();
             nodes.Add(root);
 
@@ -49,23 +52,25 @@ namespace RelEcs.Godot
 
             foreach (Node node in nodes)
             {
-                var addMethod = typeof(WorldExtensions).GetMethod("AddNodeHandle");
+                var addMethod = typeof(WorldExtensions).GetMethod("AddNodeComponent");
                 var addChildMethod = addMethod?.MakeGenericMethod(new[] { node.GetType() });
                 addChildMethod?.Invoke(null, new object[] { entity, node });
             }
-
-            return entity;
         }
 
-        public static void AddNodeHandle<T>(Entity entity, T node) where T : Node
+        public static void AddNodeComponent<T>(Entity entity, T node) where T : Node, new()
         {
-            entity.Add<T>(node);
-            node.SetMeta("Entity", new Marshallable<Entity>(entity));
+            entity.Add(node);
         }
     }
     
     public static class CommandsExtensions
     {
+        public static void SpawnRecursively(this Commands commands, Node node)
+        {
+            commands.World.SpawnRecursively(node);
+        }
+        
         public static Entity Spawn(this Commands commands, Node parent)
         {
             return commands.World.Spawn(parent);
@@ -74,6 +79,12 @@ namespace RelEcs.Godot
 
     public static class EntityExtensions
     {
+        public static Entity Attach(this Entity entity, Node node)
+        {
+            entity.World.AttachNode(entity, node);
+            return entity;
+        }
+        
         public static void DespawnAndFree(this Entity entity)
         {
             if (entity.Has<Root>())
