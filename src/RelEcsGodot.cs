@@ -87,11 +87,7 @@ namespace RelEcs.Godot
         
         public static void DespawnAndFree(this Entity entity)
         {
-            if (entity.Has<Root>())
-            {
-                entity.Get<Root>().Node.QueueFree();
-            }
-            
+            if (entity.TryGet<Root>(out var root)) root.Node.QueueFree();
             entity.Despawn();
         }
     }
