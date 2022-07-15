@@ -15,17 +15,17 @@ namespace RelEcs.Godot
         public Marshallable() => Value = default;
         public Marshallable(T value) => Value = value;
     }
-    
+
     public static class WorldExtensions
     {
         public static void SpawnRecursively(this World world, Node node)
         {
             world.Spawn(node);
-            
+
             foreach (Node child in node.GetChildren())
             {
                 if (child.GetChildCount() == 0) continue;
-                
+
                 world.SpawnRecursively(child);
             }
         }
@@ -36,12 +36,12 @@ namespace RelEcs.Godot
             world.AttachNode(entity, root);
             return entity;
         }
-        
-        public static void AttachNode(this World _, Entity entity, Node root)
+
+        public static void AttachNode(this World world, Entity entity, Node root)
         {
-            entity.Add(new Root { Node = root });
+            world.AddComponent(entity.Identity, new Root { Node = root });
             root.SetMeta("Entity", new Marshallable<Entity>(entity));
-            
+
             var nodes = new Array();
             nodes.Add(root);
 
@@ -54,41 +54,42 @@ namespace RelEcs.Godot
             {
                 var addMethod = typeof(WorldExtensions).GetMethod("AddNodeComponent");
                 var addChildMethod = addMethod?.MakeGenericMethod(new[] { node.GetType() });
-                addChildMethod?.Invoke(null, new object[] { entity, node });
+                addChildMethod?.Invoke(null, new object[] { world, entity, node });
             }
         }
 
-        public static void AddNodeComponent<T>(Entity entity, T node) where T : Node, new()
+        public static void AddNodeComponent<T>(World world, Entity entity, T node) where T : Node, new()
         {
-            entity.Add(node);
+            world.AddComponent(entity.Identity, node);
         }
     }
-    
+
     public static class CommandsExtensions
     {
         public static void SpawnRecursively(this Commands commands, Node node)
         {
             commands.World.SpawnRecursively(node);
         }
-        
+
         public static Entity Spawn(this Commands commands, Node parent)
         {
             return commands.World.Spawn(parent);
         }
+
+        public static void DespawnAndFree(this Commands commands, Entity entity)
+        {
+            if (commands.TryGetComponent<Root>(entity, out var root)) root.Node.QueueFree();
+            commands.Despawn(entity);
+        }
+
     }
 
-    public static class EntityExtensions
+    public static class EntityBuilderExtensions
     {
-        public static Entity Attach(this Entity entity, Node node)
+        public static EntityBuilder Attach(this EntityBuilder entityBuilder, Node node)
         {
-            entity.World.AttachNode(entity, node);
-            return entity;
-        }
-        
-        public static void DespawnAndFree(this Entity entity)
-        {
-            if (entity.TryGet<Root>(out var root)) root.Node.QueueFree();
-            entity.Despawn();
+            entityBuilder.World.AttachNode(entityBuilder.Id(), node);
+            return entityBuilder;
         }
     }
 }
