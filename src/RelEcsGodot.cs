@@ -7,9 +7,14 @@ namespace RelEcs.Godot
     {
         public Node Node;
     }
-
+    
+    public interface ISpawnable
+    {
+        void Spawn(Entity entity);
+    }
+    
     // wraps an ecs object into a godot variant
-    public partial class Marshallable<T> : Object
+    public class Marshallable<T> : Object
     {
         public T Value;
         public Marshallable() => Value = default;
@@ -56,6 +61,8 @@ namespace RelEcs.Godot
                 var addChildMethod = addMethod?.MakeGenericMethod(new[] { node.GetType() });
                 addChildMethod?.Invoke(null, new object[] { world, entity, node });
             }
+            
+            if (root is ISpawnable spawnable) spawnable.Spawn(entity);
         }
 
         public static void AddNodeComponent<T>(World world, Entity entity, T node) where T : Node, new()
