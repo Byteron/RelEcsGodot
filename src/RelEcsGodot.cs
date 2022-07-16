@@ -1,7 +1,7 @@
 using Godot;
 using Godot.Collections;
 
-namespace RelEcs.Godot
+namespace RelEcs
 {
     public class Root
     {
@@ -10,7 +10,7 @@ namespace RelEcs.Godot
     
     public interface ISpawnable
     {
-        void Spawn(Entity entity);
+        void Spawn(EntityBuilder entityBuilder);
     }
     
     // wraps an ecs object into a godot variant
@@ -62,7 +62,7 @@ namespace RelEcs.Godot
                 addChildMethod?.Invoke(null, new object[] { world, entity, node });
             }
             
-            if (root is ISpawnable spawnable) spawnable.Spawn(entity);
+            if (root is ISpawnable spawnable) spawnable.Spawn(new EntityBuilder(world, entity.Identity));
         }
 
         public static void AddNodeComponent<T>(World world, Entity entity, T node) where T : Node, new()
@@ -71,24 +71,25 @@ namespace RelEcs.Godot
         }
     }
 
-    public static class CommandsExtensions
+    public abstract class GodotSystem : ASystem
     {
-        public static void SpawnRecursively(this Commands commands, Node node)
+        public void SpawnRecursively(Node node)
         {
-            commands.World.SpawnRecursively(node);
+            World.SpawnRecursively(node);
         }
 
-        public static Entity Spawn(this Commands commands, Node parent)
+        public EntityBuilder Spawn(Node parent)
         {
-            return commands.World.Spawn(parent);
+            return new EntityBuilder(World, World.Spawn(parent).Identity);
         }
 
-        public static void DespawnAndFree(this Commands commands, Entity entity)
+        public void DespawnAndFree(Entity entity)
         {
-            if (commands.TryGetComponent<Root>(entity, out var root)) root.Node.QueueFree();
-            commands.Despawn(entity);
+            if (TryGetComponent<Root>(entity, out var root)) root.Node.QueueFree();
+            Despawn(entity);
         }
 
+        public override abstract void Run();
     }
 
     public static class EntityBuilderExtensions
