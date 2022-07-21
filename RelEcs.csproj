@@ -1,0 +1,10 @@
+<Project Sdk="Godot.NET.Sdk/3.3.0">
+  <PropertyGroup>
+    <LangVersion>default</LangVersion>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>A lightweight and easy to use entity component system with an effective feature set for making games with Godot.</Description>
+    <PackageProjectUrl>https://github.com/Byteron/RelEcsGodot</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/Byteron/RelEcsGodot/blob/main/LICENSE</PackageLicenseUrl>
+  </PropertyGroup>
+</Project>
