@@ -5,8 +5,8 @@
 // a pure ecs component
 class Health { public int Value; }
 
-// For the extra godot functionality, inherit from GodotSystem
-public class ExampleSystem : GodotSystem
+// For the extra godot functionality, inherit from GDSystem
+public class ExampleSystem : GDSystem
 {
     // Godot Scene
     PackedScene SomeScene = GD.Load<PackedScene>("res://SomeScene.tscn");
