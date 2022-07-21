@@ -12,14 +12,6 @@ namespace RelEcs
     {
         void Spawn(EntityBuilder entityBuilder);
     }
-    
-    // wraps an ecs object into a godot variant
-    public class Marshallable<T> : Object
-    {
-        public T Value;
-        public Marshallable() => Value = default;
-        public Marshallable(T value) => Value = value;
-    }
 
     public static class WorldExtensions
     {
@@ -45,7 +37,7 @@ namespace RelEcs
         public static void AttachNode(this World world, Entity entity, Node root)
         {
             world.AddComponent(entity.Identity, new Root { Node = root });
-            root.SetMeta("Entity", new Marshallable<Entity>(entity));
+            root.SetMeta("Entity", entity);
 
             var nodes = new Array();
             nodes.Add(root);
@@ -71,7 +63,7 @@ namespace RelEcs
         }
     }
 
-    public abstract class GodotSystem : ASystem
+    public abstract class GDSystem : ASystem
     {
         public void SpawnRecursively(Node node)
         {
