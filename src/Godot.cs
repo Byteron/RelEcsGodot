@@ -63,7 +63,7 @@ namespace RelEcs
         }
     }
 
-    public abstract class GDSystem : ASystem
+    public abstract class GDSystem : System
     {
         public void SpawnRecursively(Node node)
         {

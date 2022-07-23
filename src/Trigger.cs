@@ -25,7 +25,7 @@ internal class LifeTime
     public int Value;
 }
 
-internal class TriggerLifeTimeASystem : ASystem
+internal class TriggerLifeTimeSystem : System
 {
     public override void Run()
     {
