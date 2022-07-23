@@ -45,3 +45,5 @@ public class ExampleSystem : GDSystem
     }
 }
 ```
+
+### further documentation can be found [here](https://github.com/Byteron/RelEcs).
