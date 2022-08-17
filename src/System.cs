@@ -10,7 +10,7 @@ public interface ISystem
     void Run();
 }
 
-public abstract class System : Object, ISystem
+public abstract class EcsSystem : Object, ISystem
 {
     public World World { get; set; }
 
