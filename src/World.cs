@@ -250,14 +250,20 @@ public sealed class World : Object
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     void RemoveComponent(StorageType type, Identity identity)
     {
+        ref var meta = ref _entities[identity.Id];
+        var oldTable = _tables[meta.TableId];
+        
+        if (!oldTable.Types.Contains(type))
+        {
+            throw new Exception($"cannot remove non-existent component {type.Type.Name} from entity {identity}");
+        }
+        
         if (_isLocked)
         {
             _tableOperations.Add(new TableOperation { Add = false, Identity = identity, Type = type });
             return;
         }
 
-        ref var meta = ref _entities[identity.Id];
-        var oldTable = _tables[meta.TableId];
         var oldEdge = oldTable.GetTableEdge(type);
 
         var newTable = oldEdge.Remove;
