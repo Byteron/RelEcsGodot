@@ -1,5 +1,5 @@
+using System.Collections.Generic;
 using Godot;
-using Godot.Collections;
 
 namespace RelEcs;
 
@@ -7,7 +7,7 @@ public class Root
 {
     public Node Node;
 }
-    
+
 public interface ISpawnable
 {
     void Spawn(EntityBuilder entityBuilder);
@@ -39,21 +39,20 @@ public static class WorldExtensions
         world.AddComponent(entity.Identity, new Root { Node = root });
         root.SetMeta("Entity", entity);
 
-        var nodes = new Array();
-        nodes.Add(root);
+        var nodes = new List<Node> { root };
 
         foreach (Node child in root.GetChildren())
         {
             nodes.Add(child);
         }
 
-        foreach (Node node in nodes)
+        foreach (var node in nodes)
         {
             var addMethod = typeof(WorldExtensions).GetMethod("AddNodeComponent");
-            var addChildMethod = addMethod?.MakeGenericMethod(new[] { node.GetType() });
+            var addChildMethod = addMethod?.MakeGenericMethod(node.GetType());
             addChildMethod?.Invoke(null, new object[] { world, entity, node });
         }
-            
+
         if (root is ISpawnable spawnable) spawnable.Spawn(new EntityBuilder(world, entity.Identity));
     }
 
