@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 namespace RelEcs;
@@ -39,12 +39,7 @@ public static class WorldExtensions
         world.AddComponent(entity.Identity, new Root { Node = root });
         root.SetMeta("Entity", entity);
 
-        var nodes = new List<Node> { root };
-
-        foreach (Node child in root.GetChildren())
-        {
-            nodes.Add(child);
-        }
+        var nodes = root.GetChildren().Cast<Node>().Prepend(root).ToList();
 
         foreach (var node in nodes)
         {
