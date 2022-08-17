@@ -63,7 +63,7 @@ public static class WorldExtensions
     }
 }
 
-public abstract class GdEcsSystem : EcsSystem
+public abstract class GdSystem : EcsSystem
 {
     public void SpawnRecursively(Node node)
     {
