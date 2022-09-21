@@ -13,6 +13,12 @@ namespace RelEcs
         void Spawn(EntityBuilder entityBuilder);
     }
 
+    public class Marshallable<T> : Reference where T: class
+    {
+        public T Value;
+        public Marshallable(T value) => Value = value;
+    }
+
     public static class GodotExtensions
     {
         public static Entity Spawn(this World world, Node root)
@@ -25,7 +31,8 @@ namespace RelEcs
         public static void AttachNode(this World world, Entity entity, Node root)
         {
             world.AddComponent(entity.Identity, new Root { Node = root });
-
+            root.SetMeta("Entity", new Marshallable<Entity>(entity));
+            
             var nodes = root.GetChildren().Cast<Node>().Prepend(root).ToList();
 
             foreach (var node in nodes)
