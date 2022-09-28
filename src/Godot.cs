@@ -13,7 +13,7 @@ namespace RelEcs
         void Spawn(EntityBuilder entityBuilder);
     }
 
-    public class Marshallable<T> : Reference where T: class
+    public partial class Marshallable<T> : RefCounted where T: class
     {
         public T Value;
         public Marshallable(T value) => Value = value;
