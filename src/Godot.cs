@@ -23,14 +23,14 @@ namespace RelEcs
     {
         public static Entity Spawn(this World world, Node root)
         {
-            var entity = world.Spawn();
+            var entity = world.Spawn().Id();
             world.AttachNode(entity, root);
             return entity;
         }
 
         public static void AttachNode(this World world, Entity entity, Node root)
         {
-            world.AddComponent(entity.Identity, new Root { Node = root });
+            world.AddComponent(entity, new Root { Node = root });
             root.SetMeta("Entity", new Marshallable<Entity>(entity));
             
             var nodes = root.GetChildren().Cast<Node>().Prepend(root).ToList();
@@ -42,23 +42,18 @@ namespace RelEcs
                 addChildMethod?.Invoke(null, new object[] { world, entity, node });
             }
 
-            if (root is ISpawnable spawnable) spawnable.Spawn(new EntityBuilder(world, entity.Identity));
+            if (root is ISpawnable spawnable) spawnable.Spawn(world.On(entity));
         }
 
         public static void AddNodeComponent<T>(World world, Entity entity, T node) where T : Node, new()
         {
-            world.AddComponent(entity.Identity, node);
+            world.AddComponent(entity, node);
         }
 
-        public static EntityBuilder Spawn(this ISystem system, Node node)
+        public static void DespawnAndFree(this World world, Entity entity)
         {
-            return new EntityBuilder(system.World, system.World.Spawn(node).Identity);
-        }
-
-        public static void DespawnAndFree(this ISystem system, Entity entity)
-        {
-            if (system.TryGetComponent<Root>(entity, out var root)) root.Node.QueueFree();
-            system.Despawn(entity);
+            if (world.TryGetComponent<Root>(entity, out var root)) root.Node.QueueFree();
+            world.Despawn(entity);
         }
 
         public static EntityBuilder Attach(this EntityBuilder entityBuilder, Node node)
