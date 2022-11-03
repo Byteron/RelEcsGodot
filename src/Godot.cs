@@ -21,46 +21,39 @@ namespace RelEcs
 
     public static class GodotExtensions
     {
-        public static Entity Spawn(this World world, Node root)
+        public static EntityBuilder Spawn(this World world, Node root)
         {
-            var entity = world.Spawn();
-            world.AttachNode(entity, root);
-            return entity;
+            return world.Spawn().Attach(root);
+        }
+        
+        public static void DespawnAndFree(this World world, Entity entity)
+        {
+            if (world.TryGetComponent<Root>(entity, out var root)) root.Node.QueueFree();
+            world.Despawn(entity);
         }
 
         public static void AttachNode(this World world, Entity entity, Node root)
         {
-            world.AddComponent(entity.Identity, new Root { Node = root });
+            world.AddComponent(entity, new Root { Node = root });
             root.SetMeta("Entity", new Marshallable<Entity>(entity));
             
             var nodes = root.GetChildren().Cast<Node>().Prepend(root).ToList();
 
             foreach (var node in nodes)
             {
-                var addMethod = typeof(GodotExtensions).GetMethod("AddNodeComponent");
+                var addMethod = typeof(GodotExtensions).GetMethod(nameof(AddNodeComponent));
                 var addChildMethod = addMethod?.MakeGenericMethod(node.GetType());
                 addChildMethod?.Invoke(null, new object[] { world, entity, node });
             }
 
-            if (root is ISpawnable spawnable) spawnable.Spawn(new EntityBuilder(world, entity.Identity));
+            if (root is ISpawnable spawnable) spawnable.Spawn(new EntityBuilder(world, entity));
         }
 
         public static void AddNodeComponent<T>(World world, Entity entity, T node) where T : Node, new()
         {
-            world.AddComponent(entity.Identity, node);
+            world.AddComponent(entity, node);
         }
-
-        public static EntityBuilder Spawn(this ISystem system, Node node)
-        {
-            return new EntityBuilder(system.World, system.World.Spawn(node).Identity);
-        }
-
-        public static void DespawnAndFree(this ISystem system, Entity entity)
-        {
-            if (system.TryGetComponent<Root>(entity, out var root)) root.Node.QueueFree();
-            system.Despawn(entity);
-        }
-
+        
         public static EntityBuilder Attach(this EntityBuilder entityBuilder, Node node)
         {
             entityBuilder.World.AttachNode(entityBuilder.Id(), node);
